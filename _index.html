@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Music Quest</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  background: #f5f2ec;
+  color: #252525;
+}
+
+button {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  background: #242424;
+  color: white;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.logo span {
+  opacity: 0.65;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.lang-btn {
+  border: 1px solid #777;
+  background: transparent;
+  color: white;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.hero {
+  text-align: center;
+  padding: 40px 10px 30px;
+}
+
+.hero h1 {
+  font-size: clamp(36px, 7vw, 62px);
+  margin: 0 0 10px;
+}
+
+.hero p {
+  color: #666;
+  font-size: 17px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 24px;
+  border: 1px solid #e2ded7;
+  cursor: pointer;
+  transition: 0.18s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+  margin: 0 0 8px;
+}
+
+.card p {
+  color: #777;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.form-card {
+  min-height: 160px;
+}
+
+.topic-card {
+  min-height: 145px;
+}
+
+.topic-number {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.topic-count {
+  margin-top: 15px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.back-btn {
+  border: none;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  margin-bottom: 20px;
+  padding: 5px 0;
+}
+
+.quiz-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.quiz-topic {
+  font-size: 14px;
+  color: #777;
+}
+
+.progress-wrap {
+  background: #ddd8cf;
+  height: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.progress {
+  height: 100%;
+  width: 0;
+  background: #242424;
+  transition: width 0.25s;
+}
+
+.question-card {
+  background: white;
+  border-radius: 22px;
+  padding: 30px;
+  border: 1px solid #e2ded7;
+}
+
+.question-number {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.question-en {
+  font-size: clamp(22px, 4vw, 30px);
+  line-height: 1.35;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.question-zh {
+  font-size: clamp(18px, 3vw, 23px);
+  line-height: 1.5;
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.options {
+  display: grid;
+  gap: 12px;
+}
+
+.option {
+  width: 100%;
+  text-align: left;
+  background: #faf9f6;
+  border: 2px solid #dedbd4;
+  border-radius: 14px;
+  padding: 15px 17px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.option:hover:not(:disabled) {
+  border-color: #777;
+  background: #f4f1eb;
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+.option.correct {
+  border-color: #39734a;
+  background: #eaf5ed;
+}
+
+.option.wrong {
+  border-color: #9a4141;
+  background: #faeded;
+}
+
+.option-en {
+  display: block;
+  font-weight: 600;
+}
+
+.option-zh {
+  display: block;
+  margin-top: 4px;
+  color: #666;
+}
+
+.feedback {
+  margin-top: 22px;
+  padding: 18px;
+  border-radius: 14px;
+  background: #f3f0ea;
+  line-height: 1.6;
+}
+
+.feedback strong {
+  display: block;
+  margin-bottom: 7px;
+}
+
+.next-btn,
+.primary-btn {
+  border: none;
+  background: #242424;
+  color: white;
+  border-radius: 12px;
+  padding: 13px 20px;
+  cursor: pointer;
+  margin-top: 18px;
+  font-weight: 600;
+}
+
+.next-btn:hover,
+.primary-btn:hover {
+  opacity: 0.85;
+}
+
+.result {
+  text-align: center;
+  padding: 50px 10px;
+}
+
+.score {
+  font-size: 64px;
+  font-weight: 800;
+  margin: 15px 0;
+}
+
+.result-message {
+  color: #666;
+  font-size: 18px;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.result-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.small-note {
+  color: #888;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 15px;
+  }
+
+  .container {
+    padding: 22px 14px 50px;
+  }
+
+  .question-card {
+    padding: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="header">
+  <div class="logo">
+    🎵 Music Quest
+    <span>音樂探索</span>
+  </div>
+
+  <button class="lang-btn" onclick="toggleLanguage()">
+    中文 / English
+  </button>
+</header>
+
+<main class="container">
+
+<!-- HOME -->
+<section id="home" class="screen active">
+
+  <div class="hero">
+    <h1>Music Quest</h1>
+    <p>
+      Explore music through listening, history, theory and musical decisions.
+      <br>
+      從聆聽、音樂史、樂理到音樂判斷，探索音樂。
+    </p>
+  </div>
+
+  <div class="card-grid">
+
+    <div class="card form-card" onclick="selectForm(1)">
+      <h2>Form 1</h2>
+      <p>Foundation & Musical Exploration<br>基礎與音樂探索</p>
+      <div class="topic-count">7 topics · 20 questions each</div>
+    </div>
+
+    <div class="card form-card" onclick="selectForm(2)">
+      <h2>Form 2</h2>
+      <p>Expression & Musical Structure<br>音樂表達與結構</p>
+      <div class="topic-count">6 topics · 20 questions each</div>
+    </div>
+
+    <div class="card form-card" onclick="selectForm(3)">
+      <h2>Form 3</h2>
+      <p>Analysis & Musical Thinking<br>音樂分析與思考</p>
+      <div class="topic-count">5 topics · 20 questions each</div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- TOPICS -->
+<section id="topics" class="screen">
+
+  <button class="back-btn" onclick="showScreen('home')">
+    ← Back to Forms / 返回級別
+  </button>
+
+  <h1 id="topics-title"></h1>
+  <p id="topics-subtitle"></p>
+
+  <div id="topic-grid" class="card-grid"></div>
+
+</section>
+
+
+<!-- QUIZ -->
+<section id="quiz" class="screen">
+
+  <div class="quiz-top">
+    <div>
+      <strong id="quiz-form"></strong>
+      <div id="quiz-topic" class="quiz-topic"></div>
+    </div>
+
+    <div id="quiz-counter"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div id="progress" class="progress"></div>
+  </div>
+
+  <div class="question-card">
+
+    <div id="question-number" class="question-number"></div>
+
+    <div id="question-en" class="question-en"></div>
+
+    <div id="question-zh" class="question-zh"></div>
+
+    <div id="options" class="options"></div>
+
+    <div id="feedback" class="feedback" style="display:none;"></div>
+
+    <button
+      id="next-btn"
+      class="next-btn"
+      style="display:none;"
+      onclick="nextQuestion()">
+      Next / 下一題
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- RESULT -->
+<section id="result" class="screen">
+
+  <div class="result">
+
+    <h1>Quiz Complete!</h1>
+    <div>完成！</div>
+
+    <div id="score" class="score"></div>
+
+    <div id="result-message" class="result-message"></div>
+
+    <div class="result-buttons">
+
+      <button class="primary-btn" onclick="restartQuiz()">
+        Try Again / 再試一次
+      </button>
+
+      <button class="primary-btn" onclick="showScreen('topics')">
+        Other Topics / 其他課題
+      </button>
+
+      <button class="primary-btn" onclick="showScreen('home')">
+        Forms / 返回級別
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+</div>
+
+
+<script>
+
+/* =========================================================
+   QUESTION BANK
+   每個 topic 20 題
+   每題：
+   q  = [English, 中文]
+   options = [[English, 中文], ...]
+   answer = 正確答案 index
+   ex = [English explanation, 中文解釋]
+========================================================= */
+
+const QUESTION_BANK = {
+
+1: {
+
+  "Western Instruments / 西洋樂器": [
+
+    {
+      q:["Which instrument belongs to the string family?","以下哪件樂器屬於弦樂器？"],
+      options:[
+        ["Oboe","雙簧管"],
+        ["Viola","中提琴"],
+        ["Trumpet","小號"],
+        ["Flute","長笛"]
+      ],
+      answer:1,
+      ex:["The viola produces sound through vibrating strings.","中提琴透過琴弦振動產生聲音。"]
+    },
+
+    {
+      q:["Which instrument is a double-reed woodwind instrument?","以下哪件樂器屬於雙簧片木管樂器？"],
+      options:[
+        ["Oboe","雙簧管"],
+        ["Clarinet","單簧管"],
+        ["Flute","長笛"],
+        ["French horn","圓號"]
+      ],
+      answer:0,
+      ex:["The oboe uses two reeds vibrating together.","雙簧管使用兩片簧片一起振動。"]
+    },
+
+    {
+      q:["Which instrument is NOT a woodwind instrument?","以下哪件樂器並不屬於木管樂器？"],
+      options:[
+        ["Bassoon","巴松管"],
+        ["Clarinet","單簧管"],
+        ["French horn","圓號"],
+        ["Oboe","雙簧管"]
+      ],
+      answer:2,
+      ex:["The French horn is a brass instrument, even though it appears in the woodwind quintet.","圓號屬於銅管樂器，雖然它是木管五重奏的重要成員。"]
+    },
+
+    {
+      q:["Which instrument has the lowest register in a standard woodwind quintet?","標準木管五重奏中，哪件樂器的音域最低？"],
+      options:[
+        ["Flute","長笛"],
+        ["Oboe","雙簧管"],
+        ["Bassoon","巴松管"],
+        ["Clarinet","單簧管"]
+      ],
+      answer:2,
+      ex:["The bassoon normally provides the lowest register of the five instruments.","巴松管通常負責木管五重奏中最低的音域。"]
+    },
+
+    {
+      q:["Which instrument produces sound by blowing air across an opening rather than through a reed?","以下哪件樂器是利用氣流通過吹口邊緣發聲，而不是利用簧片？"],
+      options:[
+        ["Flute","長笛"],
+        ["Oboe","雙簧管"],
+        ["Clarinet","單簧管"],
+        ["Bassoon","巴松管"]
+      ],
+      answer:0,
+      ex:["The flute is an aerophone that uses an air stream across its embouchure hole.","長笛利用氣流通過吹口邊緣產生聲音。"]
+    },
+
+    {
+      q:["Which instrument is normally associated with the highest register in a string quartet?","弦樂四重奏中，通常負責最高音域的是哪件樂器？"],
+      options:[
+        ["Cello","大提琴"],
+        ["Viola","中提琴"],
+        ["Violin","小提琴"],
+        ["Double bass","低音提琴"]
+      ],
+      answer:2,
+      ex:["The violin normally carries the highest register in the standard string quartet.","小提琴通常負責標準弦樂四重奏中最高的音域。"]
+    },
+
+    {
+      q:["Which family does the timpani belong to?","定音鼓屬於哪一樂器家族？"],
+      options:[
+        ["Strings","弦樂器"],
+        ["Brass","銅管樂器"],
+        ["Percussion","敲擊樂器"],
+        ["Woodwind","木管樂器"]
+      ],
+      answer:2,
+      ex:["Timpani are percussion instruments with tuned drumheads.","定音鼓屬於敲擊樂器，而且可以調校音高。"]
+    },
+
+    {
+      q:["Which instrument would most naturally provide a warm, sustained middle register?","以下哪件樂器最常用來提供溫暖、持續的中音域？"],
+      options:[
+        ["Viola","中提琴"],
+        ["Piccolo","短笛"],
+        ["Trumpet","小號"],
+        ["Triangle","三角鐵"]
+      ],
+      answer:0,
+      ex:["The viola has a characteristic warm middle register.","中提琴具有較溫暖而厚實的中音域。"]
+    },
+
+    {
+      q:["Which instrument uses a slide to change pitch?","哪件樂器主要利用滑管改變音高？"],
+      options:[
+        ["Trumpet","小號"],
+        ["Trombone","長號"],
+        ["French horn","圓號"],
+        ["Tuba","大號"]
+      ],
+      answer:1,
+      ex:["The trombone changes pitch mainly by moving its slide.","長號主要透過伸縮滑管改變音高。"]
+    },
+
+    {
+      q:["Which instrument is commonly used to add a bright, penetrating colour to an orchestral texture?","以下哪件樂器常用來在管弦樂織體中加入明亮而穿透力強的音色？"],
+      options:[
+        ["Oboe","雙簧管"],
+        ["Double bass","低音提琴"],
+        ["Tuba","大號"],
+        ["Bass drum","大鼓"]
+      ],
+      answer:0,
+      ex:["The oboe has a distinctive, penetrating tone that can stand out clearly.","雙簧管具有鮮明而穿透力強的音色，很容易在樂團中突出。"]
+    },
+
+    {
+      q:["Which instrument is a brass instrument despite its curved, horn-like appearance?","哪件樂器雖然外形像號角，卻屬於銅管樂器？"],
+      options:[
+        ["English horn","英國管"],
+        ["French horn","圓號"],
+        ["Bassoon","巴松管"],
+        ["Oboe","雙簧管"]
+      ],
+      answer:1,
+      ex:["The French horn belongs to the brass family.","圓號屬於銅管樂器家族。"]
+    },
+
+    {
+      q:["Which instrument is often associated with a bright, agile high register?","以下哪件樂器常與明亮、靈活的高音域聯繫？"],
+      options:[
+        ["Piccolo","短笛"],
+        ["Bassoon","巴松管"],
+        ["Tuba","大號"],
+        ["Double bass","低音提琴"]
+      ],
+      answer:0,
+      ex:["The piccolo has a very high and penetrating register.","短笛擁有非常高而具穿透力的音域。"]
+    },
+
+    {
+      q:["Which instrument is commonly bowed rather than plucked?","以下哪件樂器通常以弓拉奏，而不是以手指撥奏？"],
+      options:[
+        ["Harp","豎琴"],
+        ["Violin","小提琴"],
+        ["Guitar","結他"],
+        ["Harp guitar","豎琴結他"]
+      ],
+      answer:1,
+      ex:["The violin is primarily played with a bow, although plucking is also possible.","小提琴主要使用琴弓演奏，但亦可以撥奏。"]
+    },
+
+    {
+      q:["Which instrument can change its colour considerably through different registers?","哪件樂器在不同音域中可以呈現相當不同的音色？"],
+      options:[
+        ["Clarinet","單簧管"],
+        ["Triangle","三角鐵"],
+        ["Cymbal","鈸"],
+        ["Snare drum","小鼓"]
+      ],
+      answer:0,
+      ex:["The clarinet has notably different timbral qualities across its registers.","單簧管在不同音域中具有明顯不同的音色特徵。"]
+    },
+
+    {
+      q:["In an orchestra, which instrument usually supports the lowest bass line among the standard strings?","在管弦樂團中，標準弦樂器裡哪件樂器通常支撐最低的低音線？"],
+      options:[
+        ["Violin","小提琴"],
+        ["Viola","中提琴"],
+        ["Cello","大提琴"],
+        ["Double bass","低音提琴"]
+      ],
+      answer:3,
+      ex:["The double bass normally provides the lowest register of the standard string section.","低音提琴通常負責標準弦樂組最低的音域。"]
+    },
+
+    {
+      q:["Which instrument belongs to the keyboard family?","以下哪件樂器屬於鍵盤樂器？"],
+      options:[
+        ["Piano","鋼琴"],
+        ["Clarinet","單簧管"],
+        ["Harp","豎琴"],
+        ["Trumpet","小號"]
+      ],
+      answer:0,
+      ex:["The piano produces sound through hammers striking strings, but it is classified as a keyboard instrument.","鋼琴透過琴槌敲擊琴弦發聲，但分類上屬於鍵盤樂器。"]
+    },
+
+    {
+      q:["Which instrument would be particularly effective for a soft, sustained melody above the orchestra?","若需要在樂團上方演奏柔和而持續的旋律，哪件樂器較適合？"],
+      options:[
+        ["Flute","長笛"],
+        ["Bass drum","大鼓"],
+        ["Tuba","大號"],
+        ["Triangle","三角鐵"]
+      ],
+      answer:0,
+      ex:["The flute can produce a light, sustained melodic line in the upper register.","長笛可以在高音域演奏輕盈而持續的旋律。"]
+    },
+
+    {
+      q:["Which statement about a woodwind quintet is correct?","以下哪項關於木管五重奏的說法正確？"],
+      options:[
+        ["All five instruments are woodwinds.","五件樂器全部都是木管樂器。"],
+        ["The French horn is included although it is a brass instrument.","雖然圓號屬於銅管樂器，木管五重奏仍包括圓號。"],
+        ["It normally contains two trumpets.","通常包括兩支小號。"],
+        ["It is made entirely of string instruments.","全部由弦樂器組成。"]
+      ],
+      answer:1,
+      ex:["A standard woodwind quintet consists of flute, oboe, clarinet, bassoon and French horn.","標準木管五重奏包括長笛、雙簧管、單簧管、巴松管及圓號。"]
+    },
+
+    {
+      q:["If you want a sound that suggests a distant, gentle dawn, which instrument would be a plausible choice for the opening melody?","如果想用音色表現遙遠而寧靜的黎明，哪件樂器較適合作為開場旋律？"],
+      options:[
+        ["Flute","長笛"],
+        ["Trombone","長號"],
+        ["Bass drum","大鼓"],
+        ["Tuba","大號"]
+      ],
+      answer:0,
+      ex:["A soft flute register can create an airy and spacious atmosphere.","柔和的長笛音域可以營造空靈而開闊的氣氛。"]
+    }
+
+  ],
+
+  "Chinese Instruments / 中國樂器": [
+
+    {
+      q:["Which instrument is a bowed Chinese string instrument?","以下哪件是以弓拉奏的中國弦樂器？"],
+      options:[
+        ["Pipa","琵琶"],
+        ["Erhu","二胡"],
+        ["Guzheng","古箏"],
+        ["Dizi","笛子"]
+      ],
+      answer:1,
+      ex:["The erhu is a two-string bowed instrument.","二胡是一種兩弦拉弦樂器。"]
+    },
+
+    {
+      q:["Which instrument is a plucked Chinese zither?","以下哪件是中國的撥弦箏類樂器？"],
+      options:[
+        ["Guzheng","古箏"],
+        ["Suona","嗩吶"],
+        ["Dizi","笛子"],
+        ["Erhu","二胡"]
+      ],
+      answer:0,
+      ex:["The guzheng is a plucked zither with movable bridges.","古箏是以撥奏為主、具有可移動琴碼的箏類樂器。"]
+    },
+
+    {
+      q:["Which instrument is a Chinese transverse bamboo flute?","哪件樂器是中國橫吹竹笛？"],
+      options:[
+        ["Pipa","琵琶"],
+        ["Dizi","笛子"],
+        ["Erhu","二胡"],
+        ["Yangqin","揚琴"]
+      ],
+      answer:1,
+      ex:["The dizi is a transverse flute traditionally made from bamboo.","笛子是中國傳統橫吹笛，傳統上多以竹製成。"]
+    },
+
+    {
+      q:["Which instrument has a particularly penetrating and powerful tone?","以下哪件樂器具有特別響亮而穿透力強的音色？"],
+      options:[
+        ["Suona","嗩吶"],
+        ["Guzheng","古箏"],
+        ["Xiao","簫"],
+        ["Yangqin","揚琴"]
+      ],
+      answer:0,
+      ex:["The suona is known for its bright and penetrating sound.","嗩吶以明亮、強烈而穿透力高的音色著稱。"]
+    },
+
+    {
+      q:["Which instrument is played by striking strings with bamboo beaters?","哪件樂器是以竹製琴竹敲擊琴弦發聲？"],
+      options:[
+        ["Yangqin","揚琴"],
+        ["Erhu","二胡"],
+        ["Dizi","笛子"],
+        ["Suona","嗩吶"]
+      ],
+      answer:0,
+      ex:["The yangqin is a hammered dulcimer played with thin bamboo beaters.","揚琴是一種以琴竹敲擊琴弦演奏的擊弦樂器。"]
+    },
+
+    {
+      q:["Which instrument is most closely associated with a plucked, percussive attack?","哪件樂器最容易產生明顯的撥弦、帶有敲擊感的起音？"],
+      options:[
+        ["Pipa","琵琶"],
+        ["Erhu","二胡"],
+        ["Xiao","簫"],
+        ["Suona","嗩吶"]
+      ],
+      answer:0,
+      ex:["The pipa has a clear and articulate plucked attack.","琵琶的撥弦起音清晰而有明顯的顆粒感。"]
+    },
+
+    {
+      q:["Which instrument would be suitable for creating a calm, flowing atmosphere?","若要營造平靜而流動的氣氛，哪件樂器較合適？"],
+      options:[
+        ["Xiao","簫"],
+        ["Suona","嗩吶"],
+        ["Big drum","大鼓"],
+        ["Gong","鑼"]
+      ],
+      answer:0,
+      ex:["The xiao can produce a soft and airy tone suitable for quiet scenes.","簫可以產生柔和、空靈的音色，適合寧靜場景。"]
+    },
+
+    {
+      q:["Which instrument is commonly associated with a singing, expressive melodic quality?","哪件樂器常被形容具有接近歌唱般的抒情音色？"],
+      options:[
+        ["Erhu","二胡"],
+        ["Gong","鑼"],
+        ["Yangqin","揚琴"],
+        ["Suona","嗩吶"]
+      ],
+      answer:0,
+      ex:["The erhu is often used for expressive, vocal-like melodic lines.","二胡常用於演奏具歌唱性和抒情性的旋律。"]
+    },
+
+    {
+      q:["Which pair consists of two Chinese plucked string instruments?","哪一組都是中國撥弦樂器？"],
+      options:[
+        ["Pipa and guzheng","琵琶與古箏"],
+        ["Erhu and dizi","二胡與笛子"],
+        ["Suona and xiao","嗩吶與簫"],
+        ["Dizi and pipa","笛子與琵琶"]
+      ],
+      answer:0,
+      ex:["Pipa and guzheng are both plucked string instruments.","琵琶與古箏都是撥弦樂器。"]
+    },
+
+    {
+      q:["Which instrument is most likely to provide a strong ceremonial entrance?","若要營造莊重而有氣勢的出場，哪件樂器較合適？"],
+      options:[
+        ["Suona","嗩吶"],
+        ["Xiao","簫"],
+        ["Erhu","二胡"],
+        ["Guzheng","古箏"]
+      ],
+      answer:0,
+      ex:["The suona's strong projection makes it effective in ceremonial and festive settings.","嗩吶音量和穿透力強，因此常適合莊重或喜慶的場合。"]
+    },
+
+    {
+      q:["Which instrument uses a membrane that contributes to its characteristic sound?","哪件樂器利用鼓膜產生其主要聲音特徵？"],
+      options:[
+        ["Chinese drum","中國鼓"],
+        ["Pipa","琵琶"],
+        ["Guzheng","古箏"],
+        ["Erhu","二胡"]
+      ],
+      answer:0,
+      ex:["A drum produces sound through the vibration of a stretched membrane.","鼓主要透過繃緊鼓膜的振動產生聲音。"]
+    },
+
+    {
+      q:["Which instrument would most naturally carry a lyrical melody in a quiet Chinese landscape scene?","如果場景是寧靜的中國山水畫面，哪件樂器較自然地負責抒情旋律？"],
+      options:[
+        ["Erhu","二胡"],
+        ["Gong","鑼"],
+        ["Big drum","大鼓"],
+        ["Suona","嗩吶"]
+      ],
+      answer:0,
+      ex:["The erhu's expressive tone can support a lyrical and reflective scene.","二胡的抒情音色適合表現寧靜、內省的畫面。"]
+    },
+
+    {
+      q:["Which instrument can use glissando-like effects by sliding the fingers along strings?","哪件樂器可以透過手指在琴弦上移動產生滑音效果？"],
+      options:[
+        ["Guzheng","古箏"],
+        ["Dizi","笛子"],
+        ["Suona","嗩吶"],
+        ["Yangqin","揚琴"]
+      ],
+      answer:0,
+      ex:["The guzheng can create expressive pitch bends and gliding effects.","古箏可以利用按弦及滑弦等技巧產生富表現力的音高變化。"]
+    },
+
+    {
+      q:["Which instrument is most clearly a wind instrument?","以下哪件最明確屬於吹奏樂器？"],
+      options:[
+        ["Dizi","笛子"],
+        ["Pipa","琵琶"],
+        ["Erhu","二胡"],
+        ["Guzheng","古箏"]
+      ],
+      answer:0,
+      ex:["The dizi produces sound through a stream of air.","笛子透過氣流振動空氣柱產生聲音。"]
+    },
+
+    {
+      q:["Which combination would create a strong contrast between sustained melody and bright plucked accompaniment?","哪種組合最能形成持續旋律與明亮撥弦伴奏的對比？"],
+      options:[
+        ["Erhu + pipa","二胡＋琵琶"],
+        ["Gong + drum","鑼＋鼓"],
+        ["Suona + gong","嗩吶＋鑼"],
+        ["Dizi + xiao","笛子＋簫"]
+      ],
+      answer:0,
+      ex:["The erhu can sustain a lyrical line while the pipa provides articulated plucked figures.","二胡可以拉出持續的抒情旋律，而琵琶可提供清晰的撥弦型。"]
+    },
+
+    {
+      q:["Which instrument would be least suitable if the musical goal is a very soft and intimate solo?","如果音樂目標是非常柔和、親密的獨奏，以下哪件樂器相對較不合適？"],
+      options:[
+        ["Suona","嗩吶"],
+        ["Xiao","簫"],
+        ["Erhu","二胡"],
+        ["Guzheng","古箏"]
+      ],
+      answer:0,
+      ex:["The suona has a powerful and penetrating tone, making very intimate softness more challenging.","嗩吶音色強烈而穿透力高，要營造非常親密的弱音效果會較具挑戰。"]
+    },
+
+    {
+      q:["Which instrument would be a natural choice for creating rapid repeated plucked patterns?","如果需要快速而有節奏感的撥弦音型，哪件樂器較自然？"],
+      options:[
+        ["Pipa","琵琶"],
+        ["Erhu","二胡"],
+        ["Xiao","簫"],
+        ["Suona","嗩吶"]
+      ],
+      answer:0,
+      ex:["The pipa can produce fast repeated plucked patterns with clear articulation.","琵琶可以演奏快速而清晰的撥弦音型。"]
+    },
+
+    {
+      q:["Which statement best describes why knowing instrument timbre matters when composing for a scene?","為甚麼作曲時了解樂器音色對表現場景很重要？"],
+      options:[
+        ["It helps choose a sound that supports the mood and imagery.","可以選擇與氣氛和畫面相配的音色。"],
+        ["It makes every instrument sound identical.","可以令所有樂器聽起來一樣。"],
+        ["It removes the need for rhythm.","可以不再需要節奏。"],
+        ["It determines the length of the concert.","可以決定音樂會長度。"]
+      ],
+      answer:0,
+      ex:["Timbre strongly affects how listeners perceive atmosphere, character and space.","音色會直接影響聽眾對氣氛、角色和空間感的理解。"]
+    }
+
+  ]
+
+},
+
+2: {
+
+  "Tempo & Dynamics / 速度與力度": [
+
+    {
+      q:["Which marking means gradually getting louder?","哪個術語表示逐漸變大聲？"],
+      options:[
+        ["Crescendo","漸強"],
+        ["Diminuendo","漸弱"],
+        ["Ritardando","漸慢"],
+        ["Accelerando","漸快"]
+      ],
+      answer:0,
+      ex:["Crescendo means gradually increasing in volume.","Crescendo 表示音量逐漸增強。"]
+    },
+
+    {
+      q:["Which change would best suggest a character becoming increasingly anxious?","如果要表現角色逐漸變得焦慮，哪項改變最有效？"],
+      options:[
+        ["Gradually faster tempo and increasing dynamics","逐漸加快速度並增強力度"],
+        ["Slower tempo and softer dynamics","逐漸減慢速度並減弱力度"],
+        ["No change at all","完全不作改變"],
+        ["Only changing the instrument name","只改變樂器名稱"]
+      ],
+      answer:0,
+      ex:["Increasing tempo and intensity can create a sense of mounting urgency.","速度和力度逐漸增加可以營造越來越強的緊張感。"]
+    },
+
+    {
+      q:["What does ritardando mean?","Ritardando 是甚麼意思？"],
+      options:[
+        ["Gradually slowing down","逐漸減慢"],
+        ["Gradually getting louder","逐漸變大聲"],
+        ["Suddenly becoming faster","突然加快"],
+        ["Repeating the melody","重複旋律"]
+      ],
+      answer:0,
+      ex:["Ritardando means gradually slowing the tempo.","Ritardando 表示速度逐漸減慢。"]
+    },
+
+    {
+      q:["Which element mainly controls how loud or soft music is?","哪個音樂元素主要控制音樂的強弱？"],
+      options:[
+        ["Dynamics","力度"],
+        ["Harmony","和聲"],
+        ["Texture","織體"],
+        ["Form","曲式"]
+      ],
+      answer:0,
+      ex:["Dynamics describe changes in loudness.","力度描述音樂音量的強弱變化。"]
+    },
+
+    {
+      q:["Which change would best suggest a peaceful sunset?","哪種改變最適合表現寧靜的日落？"],
+      options:[
+        ["Gentler dynamics and a slower tempo","較柔和的力度與較慢的速度"],
+        ["Very loud dynamics and a fast tempo","非常強的力度與快速速度"],
+        ["Sudden accents throughout","全段突然加入重音"],
+        ["Increasing tempo continuously","速度持續加快"]
+      ],
+      answer:0,
+      ex:["A slower tempo and softer dynamics can create a calm, reflective atmosphere.","較慢速度和柔和力度可以營造平靜而沉思的氣氛。"]
+    },
+
+    {
+      q:["What does accelerando mean?","Accelerando 是甚麼意思？"],
+      options:[
+        ["Gradually getting faster","逐漸加快"],
+        ["Gradually getting softer","逐漸變弱"],
+        ["Gradually getting lower","逐漸降低音高"],
+        ["Repeating a section","重複一段"]
+      ],
+      answer:0,
+      ex:["Accelerando means gradually increasing the tempo.","Accelerando 表示速度逐漸加快。"]
+    },
+
+    {
+      q:["If a composer wants a sudden shock, which combination could be effective?","如果作曲家想製造突然的震撼效果，哪種組合較有效？"],
+      options:[
+        ["Sudden dynamic change and strong accent","突然的力度變化與強烈重音"],
+        ["Very gradual diminuendo","非常緩慢的漸弱"],
+        ["Long silence followed by whispering only","長時間休止後只有極輕聲音"],
+        ["Unchanged dynamics throughout","全段力度不變"]
+      ],
+      answer:0,
+      ex:["A sudden dynamic contrast can create a strong dramatic impact.","突然的力度對比可以產生強烈的戲劇效果。"]
+    },
+
+    {
+      q:["Which pair changes different musical dimensions?","以下哪一組分別改變不同的音樂元素？"],
+      options:[
+        ["Accelerando and crescendo","漸快與漸強"],
+        ["Crescendo and forte","漸強與強"],
+        ["Adagio and largo","慢板與廣板"],
+        ["Piano and pianissimo","弱與很弱"]
+      ],
+      answer:0,
+      ex:["Accelerando changes tempo, while crescendo changes dynamics.","Accelerando 改變速度，而 crescendo 改變力度。"]
+    },
+
+    {
+      q:["A chase scene is becoming more urgent. Which choice is most convincing?","追逐場景逐漸變得緊張，哪項選擇最有說服力？"],
+      options:[
+        ["Accelerando + crescendo","漸快＋漸強"],
+        ["Ritardando + diminuendo","漸慢＋漸弱"],
+        ["Largo + pianissimo","廣板＋極弱"],
+        ["No rhythmic pulse","沒有節奏脈動"]
+      ],
+      answer:0,
+      ex:["Both tempo and dynamic intensity can reinforce increasing urgency.","速度和力度同時增加可以強化越來越急迫的感覺。"]
+    },
+
+    {
+      q:["Which musical change would make a scene feel more spacious and reflective?","哪種音樂改變會令場景感覺更開闊和沉思？"],
+      options:[
+        ["Slower tempo and lighter dynamics","較慢速度與較輕力度"],
+        ["Faster tempo and heavier accents","較快速度與更強重音"],
+        ["Constant loudness","持續強音"],
+        ["Increasing density only","只增加音符密度"]
+      ],
+      answer:0,
+      ex:["Slower pacing and softer dynamics can leave more musical space for reflection.","較慢的速度和柔和力度能留出更多音樂空間。"]
+    },
+
+    {
+      q:["What does diminuendo mean?","Diminuendo 是甚麼意思？"],
+      options:[
+        ["Gradually becoming softer","逐漸變弱"],
+        ["Gradually becoming faster","逐漸變快"],
+        ["Suddenly becoming higher","突然變高"],
+        ["Repeating the opening","重複開頭"]
+      ],
+      answer:0,
+      ex:["Diminuendo means gradually decreasing in volume.","Diminuendo 表示音量逐漸減弱。"]
+    },
+
+    {
+      q:["Which marking is associated with a fast tempo?","哪個術語通常代表較快的速度？"],
+      options:[
+        ["Allegro","快板"],
+        ["Adagio","慢板"],
+        ["Largo","廣板"],
+        ["Grave","莊板"]
+      ],
+      answer:0,
+      ex:["Allegro generally indicates a fast or lively tempo.","Allegro 通常表示快速或活潑的速度。"]
+    },
+
+    {
+      q:["Which marking is associated with a slow tempo?","哪個術語通常代表較慢的速度？"],
+      options:[
+        ["Adagio","慢板"],
+        ["Presto","極快板"],
+        ["Allegro","快板"],
+        ["Vivace","活潑快速"]
+      ],
+      answer:0,
+      ex:["Adagio generally indicates a slow tempo.","Adagio 通常表示較慢的速度。"]
+    },
+
+    {
+      q:["If a lullaby suddenly becomes very loud and fast, what changes most strongly?","如果搖籃曲突然變得非常大聲和快速，哪兩個元素改變最明顯？"],
+      options:[
+        ["Dynamics and tempo","力度與速度"],
+        ["Texture and form","織體與曲式"],
+        ["Pitch and timbre only","只改變音高與音色"],
+        ["Harmony and instrumentation only","只改變和聲與配器"]
+      ],
+      answer:0,
+      ex:["Loudness is dynamics; speed is tempo.","音量屬於力度，而快慢屬於速度。"]
+    },
+
+    {
+      q:["Which combination would best support a heroic entrance?","哪種組合最適合支持英雄式的出場？"],
+      options:[
+        ["Strong dynamics + broad, confident tempo","強力度＋寬廣而有自信的速度"],
+        ["Very soft dynamics + hesitant tempo","非常弱的力度＋猶豫的速度"],
+        ["Constant silence","持續休止"],
+        ["Only a quiet flute trill","只有安靜的長笛顫音"]
+      ],
+      answer:0,
+      ex:["Strong dynamics and a confident pulse can establish presence and authority.","強力度和穩定而有自信的脈搏感能建立氣勢。"]
+    },
+
+    {
+      q:["Why might a composer change dynamics without changing tempo?","為甚麼作曲家可以只改變力度而不改變速度？"],
+      options:[
+        ["To change intensity while preserving the pulse","在保持速度脈搏的同時改變音樂強度"],
+        ["Because tempo and dynamics mean the same thing","因為速度和力度是同一回事"],
+        ["To change the key","為了改變調性"],
+        ["To change the instruments automatically","為了自動改變樂器"]
+      ],
+      answer:0,
+      ex:["Dynamics can shape emotional intensity without changing the underlying tempo.","力度可以改變情緒強度，而不必改變基本速度。"]
+    },
+
+    {
+      q:["Which change would make a storm scene feel as if it is approaching?","如果要表現暴風雨正在逼近，哪種變化較有效？"],
+      options:[
+        ["Gradual crescendo and increasing rhythmic activity","逐漸漸強並增加節奏活動"],
+        ["Gradual silence only","只逐漸變成寂靜"],
+        ["Constant pianissimo","持續極弱"],
+        ["Slowing everything immediately","立即將所有東西放慢"]
+      ],
+      answer:0,
+      ex:["Growing intensity and rhythmic activity can suggest an approaching storm.","不斷增加的力度和節奏活動可以表現暴風雨逐漸逼近。"]
+    },
+
+    {
+      q:["Which statement is most accurate?","以下哪項說法最準確？"],
+      options:[
+        ["Tempo concerns speed; dynamics concern loudness.","速度關乎快慢；力度關乎音量。"],
+        ["Tempo means pitch.","速度就是音高。"],
+        ["Dynamics means form.","力度就是曲式。"],
+        ["Tempo and dynamics are identical.","速度和力度完全相同。"]
+      ],
+      answer:0,
+      ex:["Tempo and dynamics are separate musical parameters that can be changed independently.","速度和力度是兩個不同的音樂元素，可以分別改變。"]
+    },
+
+    {
+      q:["If the music gradually slows and becomes softer as a character leaves, what effect is created?","角色離開時，音樂逐漸減慢並變弱，會產生甚麼效果？"],
+      options:[
+        ["A sense of fading away","逐漸遠去、淡出的感覺"],
+        ["A sense of increasing danger","越來越危險的感覺"],
+        ["A sense of celebration","慶典感"],
+        ["A sense of acceleration","加速感"]
+      ],
+      answer:0,
+      ex:["Slowing and softening can make the sound seem to recede into the distance.","減慢及減弱可以令聲音產生逐漸遠去的感覺。"]
+    }
+
+  ]
+
+}
+
+};
+
+
+/* =========================================================
+   以下是 FORM 1–3 題庫尚未列出的 topic。
+   先用同一套結構加入即可。
+========================================================= */
+
+QUESTION_BANK[1]["Classical Period / 古典時期"] = [
+  {
+    q:["Which composer is strongly associated with the Classical period?","以下哪位作曲家與古典時期有密切關係？"],
+    options:[
+      ["Mozart","莫扎特"],
+      ["Chopin","蕭邦"],
+      ["Wagner","華格納"],
+      ["Debussy","德布西"]
+    ],
+    answer:0,
+    ex:["Mozart is one of the central composers of the Classical period.","莫扎特是古典時期最具代表性的作曲家之一。"]
+  },
+  {
+    q:["Which work was composed by Mozart?","以下哪首作品是莫扎特創作的？"],
+    options:[
+      ["Eine kleine Nachtmusik","《小夜曲》Eine kleine Nachtmusik"],
+      ["The Four Seasons","《四季》"],
+      ["Swan Lake","《天鵝湖》"],
+      ["The Planets","《行星》"]
+    ],
+    answer:0,
+    ex:["Eine kleine Nachtmusik is a well-known work by Mozart.","《小夜曲》Eine kleine Nachtmusik 是莫扎特著名作品。"]
+  }
+];
+
+QUESTION_BANK[1]["Chords / 和弦"] = [
+  {
+    q:["How many different pitch classes are in a basic triad?","基本三和弦由多少個不同音級組成？"],
+    options:[
+      ["Three","三個"],
+      ["Two","兩個"],
+      ["Four","四個"],
+      ["Five","五個"]
+    ],
+    answer:0,
+    ex:["A triad contains three different notes arranged in thirds.","三和弦由三個不同音組成，通常以三度關係排列。"]
+  }
+];
+
+QUESTION_BANK[1]["SoundGo Accompaniment Singing / SoundGo 伴奏唱歌"] = [
+  {
+    q:["If the accompaniment feels too high for the singer, which musical element should you consider changing first?","如果伴奏音域對歌者而言太高，首先應考慮改變哪個音樂元素？"],
+    options:[
+      ["Key","調性"],
+      ["Form","曲式"],
+      ["Texture only","只改變織體"],
+      ["Composer's name","作曲家的名字"]
+    ],
+    answer:0,
+    ex:["Changing the key can move the entire accompaniment into a more comfortable vocal range.","改變調性可以將整段伴奏移到較適合歌者的音域。"]
+  }
+];
+
+QUESTION_BANK[1]["Chinese National Anthem / 中國國歌"] = [
+  {
+    q:["What is the official title of China's national anthem?","中國國歌的正式名稱是甚麼？"],
+    options:[
+      ["March of the Volunteers","《義勇軍進行曲》"],
+      ["Yellow River Cantata","《黃河大合唱》"],
+      ["Butterfly Lovers","《梁山伯與祝英台》"],
+      ["The Moon Represents My Heart","《月亮代表我的心》"]
+    ],
+    answer:0,
+    ex:["The national anthem is March of the Volunteers.","中國國歌為《義勇軍進行曲》。"]
+  }
+];
+
+QUESTION_BANK[1]["Conducting / 指揮"] = [
+  {
+    q:["In a basic 4/4 conducting pattern, which beat normally moves downward?","在基本四拍子指揮圖式中，哪一拍通常向下？"],
+    options:[
+      ["Beat 1","第一拍"],
+      ["Beat 2","第二拍"],
+      ["Beat 3","第三拍"],
+      ["Beat 4","第四拍"]
+    ],
+    answer:0,
+    ex:["Beat 1 is normally shown with a clear downward movement.","第一拍通常以清晰的向下動作表示。"]
+  }
+];
+
+QUESTION_BANK[2]["Musical Form / 曲式"] = [
+  {
+    q:["Which pattern represents ternary form?","哪個結構代表三段體？"],
+    options:[
+      ["ABA","ABA"],
+      ["AB","AB"],
+      ["ABACA","ABACA"],
+      ["AAAA","AAAA"]
+    ],
+    answer:0,
+    ex:["Ternary form is commonly represented as ABA.","三段體通常以 ABA 表示。"]
+  }
+];
+
+QUESTION_BANK[2]["Romantic Period / 浪漫時期"] = [
+  {
+    q:["Which composer is strongly associated with the Romantic period?","以下哪位作曲家與浪漫時期有密切關係？"],
+    options:[
+      ["Chopin","蕭邦"],
+      ["Haydn","海頓"],
+      ["Mozart","莫扎特"],
+      ["Vivaldi","韋華第"]
+    ],
+    answer:0,
+    ex:["Chopin is one of the major composers associated with Romantic music.","蕭邦是浪漫時期重要作曲家之一。"]
+  }
+];
+
+QUESTION_BANK[2]["Opera / 歌劇"] = [
+  {
+    q:["What is an aria?","甚麼是 aria（詠嘆調）？"],
+    options:[
+      ["A solo vocal number expressing a character's thoughts or emotions","表達角色思想或情感的獨唱樂段"],
+      ["An orchestral tuning exercise","管弦樂團調音練習"],
+      ["A conducting pattern","指揮圖式"],
+      ["A type of chord","一種和弦"]
+    ],
+    answer:0,
+    ex:["An aria usually gives a character an opportunity for expressive solo singing.","詠嘆調通常讓角色以獨唱方式表達情感或思想。"]
+  }
+];
+
+QUESTION_BANK[2]["Suno Scene Composition / Suno 場景作曲"] = [
+  {
+    q:["To make music for a tense night-time chase, which combination is most convincing?","如果要為緊張的夜間追逐場景創作音樂，哪個組合最有說服力？"],
+    options:[
+      ["Fast tempo, rhythmic ostinato and growing dynamics","快速速度、重複節奏型及逐漸增強力度"],
+      ["Very slow tempo and no pulse","非常慢的速度而且沒有脈搏"],
+      ["Only a gentle lullaby melody","只有柔和的搖籃曲旋律"],
+      ["No rhythmic activity","完全沒有節奏活動"]
+    ],
+    answer:0,
+    ex:["Tempo, ostinato and dynamics can work together to create tension and forward motion.","速度、固定音型和力度可以共同建立緊張感及向前推進的感覺。"]
+  }
+];
+
+QUESTION_BANK[2]["Tempo & Dynamics / 速度與力度"] = QUESTION_BANK[2]["Tempo & Dynamics / 速度與力度"] || [];
+
+QUESTION_BANK[2]["Conducting / 指揮"] = [
+  {
+    q:["What is an upbeat used for in conducting?","指揮中的預備拍（upbeat）有甚麼作用？"],
+    options:[
+      ["To prepare the ensemble for the upcoming entrance","預備樂團即將開始的進入"],
+      ["To stop the orchestra permanently","永久停止樂團"],
+      ["To change the key automatically","自動改變調性"],
+      ["To tune every instrument","為所有樂器調音"]
+    ],
+    answer:0,
+    ex:["An upbeat gives performers information about when and how the next musical event will begin.","預備拍讓演奏者知道下一個音樂進入何時及以甚麼方式發生。"]
+  }
+];
+
+QUESTION_BANK[3] = {
+
+  "Meter & Rhythm / 拍子與節奏": [
+    {
+      q:["Which time signature normally contains three beats per bar?","哪個拍號通常表示每小節有三拍？"],
+      options:[
+        ["3/4","3/4"],
+        ["2/4","2/4"],
+        ["4/4","4/4"],
+        ["6/8","6/8"]
+      ],
+      answer:0,
+      ex:["3/4 normally contains three quarter-note beats per bar.","3/4 通常每小節有三個四分音符拍。"]
+    }
+  ],
+
+  "Musical Texture / 音樂織體": [
+    {
+      q:["Which texture contains a single melodic line without harmonic accompaniment?","哪種織體只有單一旋律線而沒有和聲伴奏？"],
+      options:[
+        ["Monophony","單音織體"],
+        ["Homophony","主調織體"],
+        ["Polyphony","複音織體"],
+        ["Heterophony","支聲織體"]
+      ],
+      answer:0,
+      ex:["Monophony consists of a single melodic line.","單音織體由單一旋律線構成。"]
+    }
+  ],
+
+  "Theme & Variation / 主題與變奏": [
+    {
+      q:["What remains recognisable in a set of variations?","在一組變奏曲中，通常需要保持甚麼讓聽眾辨認主題？"],
+      options:[
+        ["An identifiable connection to the original theme","與原主題保持可辨認的關係"],
+        ["Exactly the same instrumentation","完全相同的配器"],
+        ["Exactly the same tempo","完全相同的速度"],
+        ["Exactly the same dynamics","完全相同的力度"]
+      ],
+      answer:0,
+      ex:["A variation changes aspects of the theme while retaining enough identity for the connection to remain recognisable.","變奏會改變主題的某些元素，但仍保留足夠特徵讓聽眾辨認其來源。"]
+    }
+  ],
+
+  "Music Theory + Suno Scene Composition / 樂理＋Suno 場景作曲": [
+    {
+      q:["If a scene moves from loneliness to hope, which musical change could clearly support the transformation?","如果場景由孤獨轉向希望，哪種音樂變化最能支持這個轉變？"],
+      options:[
+        ["Move from darker harmony to brighter harmony and gradually open the texture","由較陰暗的和聲轉向較明亮的和聲，並逐漸擴展織體"],
+        ["Keep every musical element identical","所有音樂元素完全不變"],
+        ["Only change the title","只改變標題"],
+        ["Remove all melody","刪除所有旋律"]
+      ],
+      answer:0,
+      ex:["Harmony and texture can both communicate a change in emotional direction.","和聲及織體都可以有效表現情緒方向的轉變。"]
+    }
+  ],
+
+  "Conducting / 指揮": [
+    {
+      q:["Why might a conductor use a smaller gesture during a quiet passage?","在安靜樂段中，指揮為甚麼可能使用較小的動作？"],
+      options:[
+        ["To communicate restraint and a softer dynamic","表達克制及較柔和的力度"],
+        ["To make the orchestra play faster automatically","令樂團自動加快"],
+        ["To change the composition","改變樂曲"],
+        ["To remove the beat","取消拍子"]
+      ],
+      answer:0,
+      ex:["Gesture size can help communicate dynamic level and musical character.","指揮動作的幅度可以協助傳達力度和音樂性格。"]
+    }
+  ]
+
+};
+
+</script>
+
+</body>
+</html>
