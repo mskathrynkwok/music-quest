@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Quest</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:linear-gradient(135deg,#eef2ff,#fdf2f8);
+  color:#202124;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+.container{
+  width:100%;
+  max-width:760px;
+  background:white;
+  border-radius:24px;
+  padding:32px;
+  box-shadow:0 12px 40px rgba(0,0,0,.12);
+}
+h1{margin-top:0;font-size:34px}
+h2{font-size:24px}
+p{line-height:1.6}
+button{
+  border:0;
+  border-radius:14px;
+  padding:14px 20px;
+  font-size:17px;
+  cursor:pointer;
+}
+.start{
+  text-align:center;
+}
+.start button,.next,.restart{
+  background:#4f46e5;
+  color:white;
+  width:100%;
+  margin-top:18px;
+}
+.progress{
+  height:10px;
+  background:#e5e7eb;
+  border-radius:20px;
+  overflow:hidden;
+  margin:15px 0 25px;
+}
+.progress-bar{
+  height:100%;
+  background:#4f46e5;
+  width:0%;
+  transition:.3s;
+}
+.option{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:#f3f4f6;
+  margin:10px 0;
+}
+.option:hover{background:#e5e7eb}
+.correct{background:#bbf7d0!important}
+.wrong{background:#fecaca!important}
+.feedback{
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+  background:#f3f4f6;
+}
+.hidden{display:none}
+.score{
+  font-size:48px;
+  font-weight:700;
+  text-align:center;
+}
+.small{
+  color:#6b7280;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="startScreen" class="start">
+  <h1>🎵 Music Quest</h1>
+  <h2>Music History Challenge</h2>
+  <p>Test your knowledge of music history, instruments and musical terms!</p>
+  <p><strong>10 questions</strong> · Multiple choice · Instant feedback</p>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="quizScreen" class="hidden">
+  <div>
+    <strong id="questionNumber"></strong>
+  </div>
+
+  <div class="progress">
+    <div id="progressBar" class="progress-bar"></div>
+  </div>
+
+  <h2 id="question"></h2>
+  <div id="options"></div>
+  <div id="feedback" class="feedback hidden"></div>
+  <button id="nextButton" class="next hidden" onclick="nextQuestion()">Next Question</button>
+</div>
+
+<div id="resultScreen" class="hidden start">
+  <h1>🎉 Quiz Complete!</h1>
+  <div class="score" id="score"></div>
+  <h2 id="resultTitle"></h2>
+  <p id="resultText"></p>
+  <button class="restart" onclick="restartGame()">Play Again</button>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    q:"Which musical period came first?",
+    options:["Classical","Romantic","Baroque","Modern"],
+    answer:2,
+    explanation:"The Baroque period came before the Classical period."
+  },
+  {
+    q:"Which composer is strongly associated with the Baroque period?",
+    options:["Mozart","J.S. Bach","Beethoven","Debussy"],
+    answer:1,
+    explanation:"Johann Sebastian Bach is one of the best-known composers of the Baroque period."
+  },
+  {
+    q:"Which composer is strongly associated with the Classical period?",
+    options:["Mozart","Bach","Vivaldi","Handel"],
+    answer:0,
+    explanation:"Wolfgang Amadeus Mozart was one of the major Classical-period composers."
+  },
+  {
+    q:"What does Allegro generally mean?",
+    options:["Very slow","Fast and lively","Very soft","Free rhythm"],
+    answer:1,
+    explanation:"Allegro generally indicates a fast and lively tempo."
+  },
+  {
+    q:"Which family does the flute belong to?",
+    options:["Strings","Brass","Woodwind","Percussion"],
+    answer:2,
+    explanation:"The flute belongs to the woodwind family."
+  },
+  {
+    q:"Which of these is a string instrument?",
+    options:["Trumpet","Violin","Flute","Clarinet"],
+    answer:1,
+    explanation:"The violin produces sound using vibrating strings."
+  },
+  {
+    q:"Which period came immediately after the Baroque period?",
+    options:["Romantic","Classical","Modern","Medieval"],
+    answer:1,
+    explanation:"The Classical period followed the Baroque period."
+  },
+  {
+    q:"Which instrument became especially important during the Classical period?",
+    options:["Piano","Electric guitar","Saxophone","Synthesizer"],
+    answer:0,
+    explanation:"The piano became increasingly important during the Classical period."
+  },
+  {
+    q:"What does the dynamic marking 'p' mean?",
+    options:["Strong","Very loud","Soft","Very fast"],
+    answer:2,
+    explanation:"The Italian musical term piano, written p, means soft."
+  },
+  {
+    q:"Which composer wrote music during the Classical period?",
+    options:["Mozart","Bach","Monteverdi","Palestrina"],
+    answer:0,
+    explanation:"Mozart was a major composer of the Classical period."
+  }
+];
+
+let current=0;
+let score=0;
+let answered=false;
+
+function startGame(){
+  current=0;
+  score=0;
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("quizScreen").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion(){
+  answered=false;
+
+  const item=questions[current];
+
+  document.getElementById("questionNumber").textContent =
+    "Question "+(current+1)+" of "+questions.length;
+
+  document.getElementById("progressBar").style.width =
+    ((current)/questions.length*100)+"%";
+
+  document.getElementById("question").textContent=item.q;
+
+  const options=document.getElementById("options");
+  options.innerHTML="";
+
+  item.options.forEach((option,index)=>{
+    const button=document.createElement("button");
+    button.className="option";
+    button.textContent=option;
+    button.onclick=()=>chooseAnswer(index,button);
+    options.appendChild(button);
+  });
+
+  document.getElementById("feedback").classList.add("hidden");
+  document.getElementById("nextButton").classList.add("hidden");
+}
+
+function chooseAnswer(index,button){
+  if(answered)return;
+
+  answered=true;
+
+  const item=questions[current];
+  const buttons=document.querySelectorAll(".option");
+
+  buttons.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===item.answer)b.classList.add("correct");
+  });
+
+  const feedback=document.getElementById("feedback");
+
+  if(index===item.answer){
+    score++;
+    button.classList.add("correct");
+    feedback.innerHTML="<strong>✓ Correct!</strong><br>"+item.explanation;
+  }else{
+    button.classList.add("wrong");
+    feedback.innerHTML="<strong>✗ Not quite.</strong><br>"+item.explanation;
+  }
+
+  feedback.classList.remove("hidden");
+  document.getElementById("nextButton").classList.remove("hidden");
+}
+
+function nextQuestion(){
+  current++;
+
+  if(current>=questions.length){
+    showResult();
+  }else{
+    showQuestion();
+  }
+}
+
+function showResult(){
+  document.getElementById("quizScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
+
+  document.getElementById("score").textContent =
+    score+" / "+questions.length;
+
+  let title="";
+  let text="";
+
+  if(score>=9){
+    title="🏆 Music Master";
+    text="Excellent! You have a strong understanding of the topics.";
+  }else if(score>=7){
+    title="🌟 Great Job!";
+    text="You have a good foundation. Keep exploring music!";
+  }else if(score>=5){
+    title="🎵 Keep Exploring";
+    text="You are building your knowledge. A little more practice will help!";
+  }else{
+    title="💪 Let's Try Again";
+    text="Don't worry! Review the topics and try the quiz again.";
+  }
+
+  document.getElementById("resultTitle").textContent=title;
+  document.getElementById("resultText").textContent=text;
+}
+
+function restartGame(){
+  startGame();
+}
+</script>
+
+</body>
+</html>
